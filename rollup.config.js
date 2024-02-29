@@ -1,4 +1,4 @@
-import {terser} from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import stripCode from "rollup-plugin-strip-code";
 import {spawn} from "child_process";
 import {zip} from "compressing";
@@ -14,7 +14,7 @@ spawn( process.execPath, ["./scripts/entities.js"] );
 export default args =>
 {	
 	DEBUG = !!args.configDebug;
-	
+
 	const debugStripper = stripCode( {
 			start_comment: "@START_DEBUG",
 			end_comment: "@END_DEBUG"
@@ -46,7 +46,7 @@ export default args =>
 				output: module( "iife" )
 			}
 		];
-	
+
 	if ( !DEBUG )
 	{
 		modulePlugins.push( unitTestStripper, terser( {module: true} ), zipFile() );
@@ -62,7 +62,7 @@ export default args =>
 		} );
 		iifePlugins.push( terser( {compress: false, mangle: false, output: {beautify: true}, safari10: true} ) );
 	}
-	
+
 	return output;
 }
 
@@ -101,20 +101,20 @@ function zipFile()
 {
 	return {
 		name: "Zip",
-		
+
 		renderChunk( src, chunk, options )
 		{
 			const ext = path.extname( options.file ),
 				fileName = path.basename( options.file, ext ),
 				dirName = path.dirname( options.file );
-			
+
 			if ( ext === ".js" || ext === ".mjs" )
 				zip.compressFile(
 					Buffer.from( src ),
 					path.join( dirName, fileName + (ext === ".mjs" ? ".module" : "") +".zip" ),
 					{relativePath: fileName +".js"}
 				);
-			
+
 			return null;
 		}
 	};

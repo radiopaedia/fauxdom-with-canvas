@@ -1,0 +1,9 @@
+{
+    "include": [ "src/js-canvas/*.ts" ],
+    "exclude": [ "src/js-canvas/*.js" ],
+    "compilerOptions": {
+        "outDir": "src/js-canvas/",
+        "target": "es6",
+        "moduleResolution": "bundler"
+    }
+}
