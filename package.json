@@ -33,9 +33,9 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "npm run build:debug && jest",
-		"build:ts": "npx tsc --allowImportingTsExtensions false --outDir ./src/js-canvas/ --module es6 --moduleResolution bundler ./src/js-canvas/*.ts",
+		"build:ts": "npm run tsc --allowImportingTsExtensions false --outDir ./src/js-canvas/ --module es6 --moduleResolution bundler ./src/js-canvas/*.ts",
 		"build:debug": "rollup -c --configDebug --silent",
-		"prepare": "rollup -c --silent"
+		"prepare": "npm run build:ts && rollup -c --silent"
 	},
 	"devDependencies": {
 		"compressing": "^1.5.0",
