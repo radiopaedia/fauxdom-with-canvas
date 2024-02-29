@@ -53,12 +53,14 @@ export function createInlineStyle( elem )
 			return styleToMap(elem.attributes.style).get(prop);
 		},
 		set(target, name, value) {
-			if (!valid(name)) return;
+			// Fail silently (return truthy value to avoid showing an TypeError)
+			if (!valid(name)) return true;
 
 			const prop = dom2prop(name);
 			const map = styleToMap(elem.attributes.style);
 
 			elem.attributes.style = mapToStyle(map.set(prop, value));
+			return true;
 		},
 		deleteProperty(target, name) {
 			if (!valid(name)) return;
