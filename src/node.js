@@ -1,5 +1,6 @@
 import DOM from "./document.js";
 import Parser from "./html-parser.js";
+import EventTarget from "./event-target.js";
 import {createTokenList} from "./token-list.js";
 import {createInlineStyle, updateInlineStyle} from "./css-style-declaration.js";
 import {querySelector, closest, matches} from "./selectors.js";
@@ -34,7 +35,7 @@ export function createNode( nodeType, baseClass = Node )
 	return node;
 }
 
-export default class Node
+export default class Node extends EventTarget
 {
 	constructor()
 	{
