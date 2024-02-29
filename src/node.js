@@ -1,12 +1,14 @@
 import DOM from "./document.js";
 import Parser from "./html-parser.js";
 import {createTokenList} from "./token-list.js";
+import {createInlineStyle, updateInlineStyle} from "./css-style-declaration.js";
 import {querySelector, closest, matches} from "./selectors.js";
 import {serializeNode} from "./serializer.js";
 import {DOCTYPE, HEAD, BODY, NODE_TYPE, PARENT_NODE, OWNER, TAG_NAME, PARSER_OPTIONS,
 	spacesRE, nodeTypes, selfClosingTags, setupDocument, getDocument, detachNodes, setNodeParent} from "./utils.js";
 
 const CLASS_LIST = Symbol( "classList" );
+const INLINE_STYLE = Symbol( "style" );
 
 export function createNode( nodeType, baseClass = Node )
 {
@@ -167,6 +169,24 @@ export default class Node
 			if ( nodes )
 				addChildNode( this.parentNode, nodes, idx, 1 );
 			else detachNodes( this.parentNode.childNodes.splice( idx, 1 ) );
+		}
+	}
+
+	get style()
+	{
+		if ( this.attributes )
+		{
+			if ( !this[INLINE_STYLE] )
+				this[INLINE_STYLE] = createInlineStyle( this );
+			return this[INLINE_STYLE];
+		}
+		return null;
+	}
+	set style( value )
+	{
+		if ( this.attributes )
+		{
+			updateInlineStyle( this[INLINE_STYLE], value );
 		}
 	}
 	
