@@ -2,6 +2,7 @@ import "./polyfills.js";
 
 import Parser from "./html-parser.js";
 import Node, {createNode} from "./node.js";
+import {createCanvasNode} from "./canvas-node.js";
 import {serializeNode} from "./serializer.js";
 import EntityEncoder from "./entity-encoder.js";
 import {DOCTYPE, HEAD, BODY, DOCUMENT_ELEMENT, NODE_TYPE, TAG_NAME, PARSER_OPTIONS,
@@ -133,37 +134,37 @@ export default class DOM extends Node
 			else this[DOCUMENT_ELEMENT].appendChild( val );
 		}
 	}
-	
+
 	get entityEncoder()
 	{
 		return this[ENTITY_ENCODER];
 	}
-	
+
 	createElement( tagName )
 	{
 		if ( tagName && typeof tagName === "string" )
 		{
-			const node = createNode( Node.ELEMENT_NODE );
+			const node = createNodeForTagName( tagName );
 			node[TAG_NAME] = tagName.toUpperCase();
 			return node;
 		}
 	}
-	
+
 	createTextNode( text )
 	{
 		return createTextBasedNode( Node.TEXT_NODE, text );
 	}
-	
+
 	createComment( data )
 	{
 		return createTextBasedNode( Node.COMMENT_NODE, data );
 	}
-	
+
 	createCDATASection( data )
 	{
 		return createTextBasedNode( Node.CDATA_SECTION_NODE, data, "]]>" );
 	}
-	
+
 	createProcessingInstruction( target, data )
 	{
 	NewNode:
@@ -183,12 +184,12 @@ export default class DOM extends Node
 		}
 		throw new Error( "Invalid target name "+ JSON.stringify( target ) +"." );
 	}
-	
+
 	createDocumentType( name, publicId, systemId )
 	{
 		return setupDocumentType( createNode( Node.DOCUMENT_TYPE_NODE ), name, publicId, systemId );
 	}
-	
+
 	getElementsByName( name )
 	{
 		const nodeList = [];
@@ -232,6 +233,17 @@ function setupDocumentType( doctype, name, publicId, systemId )
 	else doctype.name = doctype.publicId = doctype.systemId = "";
 	
 	return doctype;
+}
+
+function createNodeForTagName( tagName )
+{
+	switch ( tagName.toLowerCase() )
+	{
+		case 'canvas':
+			return createCanvasNode( Node.ELEMENT_NODE );
+		default:
+			return createNode( Node.ELEMENT_NODE );
+	}
 }
 
 /* @START_UNIT_TESTS */
