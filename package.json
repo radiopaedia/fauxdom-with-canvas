@@ -22,6 +22,8 @@
 	"homepage": "https://github.com/sedouri/fauxdom",
 	"files": [
 		"lib/fauxdom.cjs",
+		"lib/fauxdom.mjs",
+		"lib/fauxdom.js",
 		"lib/entities.json"
 	],
 	"directories": {
