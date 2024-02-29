@@ -1,5 +1,4 @@
 import {terser} from "rollup-plugin-terser";
-import buble from "@rollup/plugin-buble";
 import stripCode from "rollup-plugin-strip-code";
 import {spawn} from "child_process";
 import {zip} from "compressing";
@@ -29,7 +28,7 @@ export default args =>
 			end_comment: "@END_BROWSER_ONLY"
 		} ),
 		modulePlugins = [debugStripper, browserStripper],
-		iifePlugins = [debugStripper, unitTestStripper, buble()],
+		iifePlugins = [debugStripper, unitTestStripper],
 		output = [
 			{
 				onwarn,
