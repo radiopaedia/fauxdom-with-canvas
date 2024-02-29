@@ -85,7 +85,7 @@ function processEntities( entities )
 			{
 				let entity = entities[k];
 				
-				if ( typeof entity === "number" && isFinite( entity ) )
+				if ( Number.isFinite( entity ) )
 					entity = String.fromCodePoint( entity );
 				else if ( typeof entity !== "string" || entity === "" )
 					continue;
