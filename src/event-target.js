@@ -3,8 +3,6 @@
 const EVENT_LISTENERS = Symbol("event-listeners");
 
 export default class EventTarget {
-	constructor() {}
-
 	addEventListener( eventType, callback, useCaptureOrOptions )
 	{
 		// Lazily create the event listener map on the node

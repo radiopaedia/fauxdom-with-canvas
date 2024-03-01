@@ -4,9 +4,8 @@ import {NODE_TYPE, PARENT_NODE, OWNER, TAG_NAME} from "./utils.js";
 
 export function createCanvasNode( nodeType )
 {
-	const node = createNode( CanvasNode.prototype );
-	console.log('creating a CanvasNode', node);
-	
+	const node = new HTMLCanvasElement()
+
 	node[NODE_TYPE] = nodeType;
 	node.nodeValue = null;
 	node[PARENT_NODE] = null;
@@ -25,8 +24,4 @@ export function createCanvasNode( nodeType )
 	}
 	
 	return node;
-}
-
-export default class CanvasNode extends HTMLCanvasElement {
-
 }

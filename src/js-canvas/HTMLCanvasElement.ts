@@ -1,6 +1,6 @@
 // https://html.spec.whatwg.org/multipage/canvas.html#the-canvas-element
 
-import Node from '../node.js';
+import Node, {EXTEND_NODE} from '../node.js';
 import {
 	RenderingContext,
 	CanvasRenderingContext2D, CanvasRenderingContext2DSettings,
@@ -13,29 +13,34 @@ import {
 export type ContextID = "2d" | "bitmaprenderer" | "webgl" | "webgl2" | "webgpu" | string
 
 // Implementation
+const WIDTH: unique symbol = Symbol("canvas-width");
+const HEIGHT: unique symbol = Symbol("canvas-width");
+
+const CONTEXT: unique symbol = Symbol("canvas-width");
+
 export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement> {
-	private w: number;
-	private h: number;
+	private [WIDTH]: number;
+	private [HEIGHT]: number;
+
+	private [CONTEXT]: RenderingContext;
 
 	get width(): number {
-		console.debug(`[HTMLCanvasElement] get width: ${this.w}`);
-		return this.w;
+		console.debug(`[HTMLCanvasElement] get width: ${this[WIDTH]}`);
+		return this[WIDTH];
 	}
 	get height(): number {
-		console.debug(`[HTMLCanvasElement] get height: ${this.h}`);
-		return this.h;
+		console.debug(`[HTMLCanvasElement] get height: ${this[HEIGHT]}`);
+		return this[HEIGHT];
 	}
 
 	set width(width: number) {
-		console.debug(`[HTMLCanvasElement] set width = ${this.w}`);
-		this.w = width;
+		console.debug(`[HTMLCanvasElement] set width = ${this[WIDTH]}`);
+		this[WIDTH] = width;
 	}
 	set height(height: number) {
-		console.debug(`[HTMLCanvasElement] set height = ${this.h}`);
-		this.h = this.height;
+		console.debug(`[HTMLCanvasElement] set height = ${this[HEIGHT]}`);
+		this[HEIGHT] = this.height;
 	}
-
-	private context: RenderingContext;
 
 	getContext(contextId: "2d", options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D | null;
 	//getContext(contextId: "bitmaprenderer", options?: ImageBitmapRenderingContextSettings): ImageBitmapRenderingContext | null;
@@ -43,11 +48,11 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	getContext(contextId: ContextID, _options?: any): CanvasRenderingContext2D {
 		if (contextId != "2d") throw new Error(`Not implemented: ${contextId}`);
 
-		this.context = this.context || new CanvasRenderingContext2D(this);
+		this[CONTEXT] = this[CONTEXT] || new CanvasRenderingContext2D(this);
 
-		if (!(this.context instanceof CanvasRenderingContext2D)) throw new Error(`Context invalid`);
+		if (!(this[CONTEXT] instanceof CanvasRenderingContext2D)) throw new Error(`Context invalid`);
 
-		return this.context;
+		return this[CONTEXT];
 	}
 
 	toDataURL(_type = "image/png", _quality: any): string {
@@ -66,10 +71,10 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	}
 
 	constructor() {
-		super();
+		super(EXTEND_NODE);
 
 		// The default size of a new canvas in most implementations
-		this.width = 300
-		this.height = 150
+		this[WIDTH] = 300;
+		this[HEIGHT] = 150;
 	}
 };

@@ -11,6 +11,8 @@ import {DOCTYPE, HEAD, BODY, NODE_TYPE, PARENT_NODE, OWNER, TAG_NAME, PARSER_OPT
 const CLASS_LIST = Symbol( "classList" );
 const INLINE_STYLE = Symbol( "style" );
 
+export const EXTEND_NODE = Symbol( "extendNode" );
+
 export function createNode( nodeType, baseClass = Node )
 {
 	const node = Object.create( baseClass.prototype );
@@ -39,6 +41,9 @@ export default class Node extends EventTarget
 {
 	constructor()
 	{
+		// We allow `extend`-ing `class`-es to call super(EXTEND_NODE)
+		if (arguments[0] === EXTEND_NODE) return;
+
 		throw new Error( "Cannot directly instantiate Node." );
 	}
 	
@@ -187,6 +192,9 @@ export default class Node extends EventTarget
 	{
 		if ( this.attributes )
 		{
+			if ( !this[INLINE_STYLE] )
+				this[INLINE_STYLE] = createInlineStyle( this );
+
 			updateInlineStyle( this[INLINE_STYLE], value );
 		}
 	}
