@@ -34,12 +34,12 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	}
 
 	set width(width: number) {
-		console.debug(`[HTMLCanvasElement] set width = ${this[WIDTH]}`);
+		console.debug(`[HTMLCanvasElement] set width = ${width}`);
 		this[WIDTH] = width;
 	}
 	set height(height: number) {
-		console.debug(`[HTMLCanvasElement] set height = ${this[HEIGHT]}`);
-		this[HEIGHT] = this.height;
+		console.debug(`[HTMLCanvasElement] set height = ${height}`);
+		this[HEIGHT] = height;
 	}
 
 	getContext(contextId: "2d", options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D | null;
