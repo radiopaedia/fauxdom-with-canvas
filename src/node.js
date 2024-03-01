@@ -41,6 +41,8 @@ export default class Node extends EventTarget
 {
 	constructor()
 	{
+		super();
+
 		// We allow `extend`-ing `class`-es to call super(EXTEND_NODE)
 		if (arguments[0] === EXTEND_NODE) return;
 
