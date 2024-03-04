@@ -37,7 +37,7 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	}
 
 	fillRect(x: number, y: number, w: number, h: number): void {
-		console.log(`[HTMLCanvasElement] Not implemented: context2d.fillRect( ${Array.from(arguments).join(', ')} )`);
+		console.log(`${this} Not implemented: context2d.fillRect( ${Array.from(arguments).join(', ')} )`);
 	}
 
 	strokeRect(x: number, y: number, w: number, h: number): void {
@@ -55,7 +55,7 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	drawImage(image: CanvasImageSource, x1: number, y1: number, w1?: number, h1?: number, x2?: number, y2?: number, w2?: number, h2?: number): void {
 		//let dx,dy,dw,dh;
 		//let sx,sy,sw,sh;
-		console.log(`[HTMLCanvasElement] Not implemented: context2d.drawImage( ${Array.from(arguments).join(', ')} )`);
+		console.log(`${this} Not implemented: context2d.drawImage( ${Array.from(arguments).join(', ')} )`);
 	}
 
 	// CanvasImageData
@@ -66,7 +66,7 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	}
 
 	getImageData(sx: number, sy: number, sw: number, sh: number, settings?: ImageDataSettings): ImageData {
-		console.log(`[HTMLCanvasElement] Not implemented: context2d.getImageData( ${Array.from(arguments).join(', ')} )`);
+		console.log(`${this} Not implemented: context2d.getImageData( ${Array.from(arguments).join(', ')} )`);
 		const id = new ImageData(sw, sh, settings);
 		return id;
 	}
@@ -74,16 +74,20 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	putImageData(imagedata: ImageData, dx: number, dy: number): void;
 	putImageData(imagedata: ImageData, dx: number, dy: number, dirtyX: number, dirtyY: number, dirtyWidth: number, dirtyHeight: number): void;
 	putImageData(imagedata: ImageData, dx: number, dy: number, dirtyX?: number, dirtyY?: number, dirtyWidth?: number, dirtyHeight?: number): void {
-		console.log(`[HTMLCanvasElement] Not implemented: context2d.putImageData( ${Array.from(arguments).join(', ')} )`);
+		console.log(`${this} Not implemented: context2d.putImageData( ${Array.from(arguments).join(', ')} )`);
 	}	
 
 	// From CanvasTransform
     setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void;
     setTransform(transform?: DOMMatrix2DInit): void;
 	setTransform(matrixOrA?: any, b?, c?, d?, e?, f?) {
-		console.log(`[HTMLCanvasElement] Not implemented: context2d.setTransform( ${Array.from(arguments).join(', ')} )`);
+		console.log(`${this} Not implemented: context2d.setTransform( ${Array.from(arguments).join(', ')} )`);
 	}
 
+	// Stringifies the context object with its canvas & unique ID to ease debugging
+	get [Symbol.toStringTag]() {
+		return `${this.canvas[Symbol.toStringTag]}::context2d`;
+	}
 }
 
 export interface ImageBitmapRenderingContextSettings {

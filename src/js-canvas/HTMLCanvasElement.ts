@@ -17,28 +17,32 @@ const WIDTH: unique symbol = Symbol("canvas-width");
 const HEIGHT: unique symbol = Symbol("canvas-width");
 
 const CONTEXT: unique symbol = Symbol("canvas-width");
+const EID: unique symbol = Symbol("element-id");
 
 export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement> {
+	// The unique ID of the element assigned at creation time (to aid debugging)
+	private [EID]: string;
+
 	private [WIDTH]: number;
 	private [HEIGHT]: number;
 
 	private [CONTEXT]: RenderingContext;
 
 	get width(): number {
-		console.debug(`[HTMLCanvasElement] get width: ${this[WIDTH]}`);
+		console.debug(`${this} get width: ${this[WIDTH]}`);
 		return this[WIDTH];
 	}
 	get height(): number {
-		console.debug(`[HTMLCanvasElement] get height: ${this[HEIGHT]}`);
+		console.debug(`${this} get height: ${this[HEIGHT]}`);
 		return this[HEIGHT];
 	}
 
 	set width(width: number) {
-		console.debug(`[HTMLCanvasElement] set width = ${width}`);
+		console.debug(`${this} set width = ${width}`);
 		this[WIDTH] = width;
 	}
 	set height(height: number) {
-		console.debug(`[HTMLCanvasElement] set height = ${height}`);
+		console.debug(`${this} set height = ${height}`);
 		this[HEIGHT] = height;
 	}
 
@@ -73,8 +77,16 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	constructor() {
 		super(EXTEND_NODE);
 
+		// Assign a new pseudo-random element ID
+		this[EID] = (Math.random()*(36**6)|0).toString(36);
+
 		// The default size of a new canvas in most implementations
 		this[WIDTH] = 300;
 		this[HEIGHT] = 150;
+	}
+
+	// Stringifies the object including its unique element tag
+	get [Symbol.toStringTag]() {
+		return `HTMLCanvasElement#${this[EID]}`
 	}
 };
