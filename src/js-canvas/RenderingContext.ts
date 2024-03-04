@@ -133,6 +133,51 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	putImageData(imagedata: ImageData, dx: number, dy: number): void;
 	putImageData(imagedata: ImageData, dx: number, dy: number, dirtyX: number, dirtyY: number, dirtyWidth: number, dirtyHeight: number): void;
 	putImageData(imagedata: ImageData, dx: number, dy: number, dirtyX?: number, dirtyY?: number, dirtyWidth?: number, dirtyHeight?: number): void {
+		let premultWarnLow, premultWarnZero;
+		const canvas = this.canvas[CANVAS_DATA];
+		if (dirtyX === undefined) {
+			if (dx === 0 && dy === 0 && imagedata.width === this.canvas.width && imagedata.height === this.canvas.height) {
+				console.log(`${this}→putImageData( ${Array.from(arguments).join(', ')} ) whole canvas ${this.canvas.width}x${this.canvas.height}`);
+
+				for (let col = 0; col < imagedata.height; ++col) {
+					for (let row = 0; row < imagedata.width; ++row) {
+						const idx = (col*imagedata.width+row)*4;
+
+						const alpha = imagedata.data[idx+3],
+							r = imagedata.data[idx+0],
+							g = imagedata.data[idx+1],
+							b = imagedata.data[idx+2];
+
+						// Transparent pixels that are not fully black/white have browser inconsistencies
+						// Context for these warnings:
+						// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData#data_loss_due_to_browser_optimization
+						if (alpha === 0 && (r|g|b) !== 0 && (r&g&b) !== 255) {
+							premultWarnZero = true;
+						} else if (alpha < 255 && (r|g|b) !== 0 && (r&g&b) !== 255) {
+							premultWarnLow = true;
+						}
+
+						canvas[idx+0] = r;
+						canvas[idx+1] = g;
+						canvas[idx+2] = b;
+						canvas[idx+3] = alpha; //a
+					}
+				}
+
+				if (premultWarnLow) {
+					console.log(`${this} Compat warning: image contained colored non-opaque pixels (alpha<255), the result be inconsistent with observed browser behavior.`);
+				}
+				if (premultWarnZero) {
+					console.log(`${this} Compat warning: image contained fully transparent colored pixels (alpha=0), the result of this operation may differ from browser behavior.`);
+				}
+
+				return
+			}
+
+			console.log(`${this} Not implemented: non-whole-canvas putImageData( ${Array.from(arguments).join(', ')} )`);
+			return
+		}
+
 		console.log(`${this} Not implemented: context2d.putImageData( ${Array.from(arguments).join(', ')} )`);
 	}	
 
