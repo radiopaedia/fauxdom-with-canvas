@@ -14,10 +14,13 @@ export type ContextID = "2d" | "bitmaprenderer" | "webgl" | "webgl2" | "webgpu" 
 
 // Implementation
 const WIDTH: unique symbol = Symbol("canvas-width");
-const HEIGHT: unique symbol = Symbol("canvas-width");
+const HEIGHT: unique symbol = Symbol("canvas-height");
 
-const CONTEXT: unique symbol = Symbol("canvas-width");
+const CONTEXT: unique symbol = Symbol("canvas-context");
 const EID: unique symbol = Symbol("element-id");
+
+// Access canvas data (for the Context or testing/debugging)
+export const CANVAS_DATA: unique symbol = Symbol("accesscanvas-data");
 
 export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement> {
 	// The unique ID of the element assigned at creation time (to aid debugging)
@@ -27,6 +30,8 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	private [HEIGHT]: number;
 
 	private [CONTEXT]: RenderingContext;
+
+	[CANVAS_DATA]: Uint8ClampedArray;
 
 	get width(): number {
 		console.debug(`${this} get width: ${this[WIDTH]}`);
@@ -81,12 +86,17 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 		this[EID] = (Math.random()*(36**6)|0).toString(36);
 
 		// The default size of a new canvas in most implementations
-		this[WIDTH] = 300;
-		this[HEIGHT] = 150;
+		this.resize(300, 150);
 	}
 
 	// Stringifies the object including its unique element tag
 	get [Symbol.toStringTag]() {
 		return `HTMLCanvasElement#${this[EID]}`
+	}
+
+	private resize(width: number, height: number) {
+		this[WIDTH] = width;
+		this[HEIGHT] = height;
+		this[CANVAS_DATA] = new Uint8ClampedArray(this[WIDTH]*this[HEIGHT]*4);
 	}
 };
