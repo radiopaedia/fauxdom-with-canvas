@@ -120,6 +120,11 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	}
 
 	getImageData(sx: number, sy: number, sw: number, sh: number, settings?: ImageDataSettings): ImageData {
+		if (sx === 0 && sy === 0 && sw === this.canvas.width && sh === this.canvas.height && !settings) {
+			console.log(`${this}→getImageData( ${Array.from(arguments).join(', ')} ) whole canvas ${this.canvas.width}x${this.canvas.height}`);
+			return new ImageData(this.canvas[CANVAS_DATA], this.canvas.width, this.canvas.height);
+		}
+
 		console.log(`${this} Not implemented: context2d.getImageData( ${Array.from(arguments).join(', ')} )`);
 		const id = new ImageData(sw, sh, settings);
 		return id;

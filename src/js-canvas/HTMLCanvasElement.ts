@@ -34,21 +34,25 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	[CANVAS_DATA]: Uint8ClampedArray;
 
 	get width(): number {
-		console.debug(`${this} get width: ${this[WIDTH]}`);
+		console.debug(`${this}→width? (${this[WIDTH]})`);
 		return this[WIDTH];
 	}
 	get height(): number {
-		console.debug(`${this} get height: ${this[HEIGHT]}`);
+		console.debug(`${this}→height? (${this[HEIGHT]})`);
 		return this[HEIGHT];
 	}
 
 	set width(width: number) {
-		console.debug(`${this} set width = ${width}`);
+		console.debug(`${this}→width = ${width}`);
 		this[WIDTH] = width;
+
+		this.resize(this[WIDTH],this[HEIGHT]);
 	}
 	set height(height: number) {
-		console.debug(`${this} set height = ${height}`);
+		console.debug(`${this}→height = ${height}`);
 		this[HEIGHT] = height;
+
+		this.resize(this[WIDTH],this[HEIGHT]);
 	}
 
 	getContext(contextId: "2d", options?: CanvasRenderingContext2DSettings): CanvasRenderingContext2D | null;
@@ -98,5 +102,6 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 		this[WIDTH] = width;
 		this[HEIGHT] = height;
 		this[CANVAS_DATA] = new Uint8ClampedArray(this[WIDTH]*this[HEIGHT]*4);
+		console.debug(`${this}→reset, new size: ${this[WIDTH]}x${this[HEIGHT]} (${this[CANVAS_DATA].length}b)`);
 	}
 };

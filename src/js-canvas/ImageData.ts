@@ -27,7 +27,7 @@ export class ImageData {
 		let colorSpace = "srgb";
 
 		if (rgbaArray) {
-			console.log(`[ImageData] Warning: Array initializer support is experimental! ( new ImageData(${Array.from(arguments).join(',')}) )`);
+			console.log(`[ImageData] Warning: Array initializer support is experimental! ( new ImageData([${rgbaArray.length}b ${rgbaArray?.constructor?.name??"Array"}], ${Array.from(arguments).slice(1).join(',')}) )`);
 
 			this.width = heightOrWidth;
 			this.height = typeof settingsOrHeight === "number" ? settingsOrHeight : undefined;
