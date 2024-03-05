@@ -62,3 +62,9 @@ export class ImageData {
 		}
 	}
 };
+
+// Export onto the global scope
+if (globalThis && typeof globalThis.ImageData !== "object") {
+	// @ts-ignore
+	globalThis.ImageData = ImageData;
+}
