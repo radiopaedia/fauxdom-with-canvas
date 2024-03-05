@@ -65,7 +65,7 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 
 		// Optimization: full-canvas fill
 		if (x === 0 && y === 0 && data.length === w*h*4) {
-			for (let i = 0; i < w*h; ++i) {
+			for (let i = 0; i < data.length; ++i) {
 				data[i+0] = r;
 				data[i+1] = g;
 				data[i+2] = b;
