@@ -161,7 +161,11 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	createImageData(sw: number, sh: number, settings?: ImageDataSettings): ImageData;
 	createImageData(imagedata: ImageData): ImageData;
 	createImageData(widthOrImagedata: number|ImageData, height?: number, settings?: ImageDataSettings): ImageData {
-		throw new Error("Not implemented");
+		if (widthOrImagedata instanceof ImageData) {
+			return new ImageData(widthOrImagedata.data, widthOrImagedata.width, widthOrImagedata.height);
+		}
+
+		return new ImageData(widthOrImagedata, height, settings);
 	}
 
 	getImageData(sx: number, sy: number, sw: number, sh: number, settings?: ImageDataSettings): ImageData {
