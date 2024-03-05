@@ -105,3 +105,9 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 		console.debug(`${this}→reset, new size: ${this[WIDTH]}x${this[HEIGHT]} (${this[CANVAS_DATA].length}b)`);
 	}
 };
+
+// Export onto the global scope
+if (globalThis && typeof globalThis.HTMLCanvasElement !== "object") {
+	// @ts-ignore
+	globalThis.HTMLCanvasElement = HTMLCanvasElement;
+}

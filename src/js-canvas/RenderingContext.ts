@@ -107,9 +107,54 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	drawImage(image: CanvasImageSource, dx: number, dy: number, dw: number, dh: number): void;
 	drawImage(image: CanvasImageSource, sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, dw: number, dh: number): void;
 	drawImage(image: CanvasImageSource, x1: number, y1: number, w1?: number, h1?: number, x2?: number, y2?: number, w2?: number, h2?: number): void {
+		if (image instanceof globalThis.HTMLCanvasElement) {
+			w1 = w1 ?? image.width;
+			h1 = h1 ?? image.height;
+
+			if (w1 !== w2 || h1 !== h2) {
+				console.log(`${this} Not implemented: image scaling in drawImage( <${image.constructor.name}> ${Array.from(arguments).join(', ')} )`);
+				return;
+			}
+
+			const srcImage = image.getContext("2d").getImageData(x1, y1, w1, h1);
+			const srcPixels = srcImage.data;
+			const dstPixels = this.canvas[CANVAS_DATA];
+			const rows = h1;
+			const cols = w1;
+
+			for (let row = 0; row < rows; ++row) {
+				for (let col = 0; col < cols; ++col) {
+					// source pixel
+					const si = ((y1 + row) * srcImage.width + x1 + col) * 4;
+					const sr = srcPixels[ si ];
+					const sg = srcPixels[ si+1 ];
+					const sb = srcPixels[ si+2 ];
+					const sa = srcPixels[ si+3 ];
+
+					// destination pixel
+					const di = ((y2 + row) * srcImage.width + x2 + col) * 4;
+					const dr = dstPixels[ di ];
+					const dg = dstPixels[ di+1 ];
+					const db = dstPixels[ di+2 ];
+					const da = dstPixels[ di+3 ];
+
+					// blend pixels using premultiplied alpha and the default 'source-over' composition
+					// https://drafts.fxtf.org/compositing/#porterduffcompositingoperators_srcover
+					const dstcontrib = (1 - sa/255)
+					dstPixels[ di+0 ] = sr * (sa/255) + dr * (da/255) * dstcontrib |0;
+					dstPixels[ di+1 ] = sg * (sa/255) + dg * (da/255) * dstcontrib |0;
+					dstPixels[ di+2 ] = sb * (sa/255) + db * (da/255) * dstcontrib |0;
+
+					dstPixels[ di+3 ] = sa + da*dstcontrib |0;
+				}
+			}
+			console.log(`${this}→drawImage( <${image.constructor.name}> ${Array.from(arguments).join(', ')} )`);
+			return;
+		}
+
 		//let dx,dy,dw,dh;
 		//let sx,sy,sw,sh;
-		console.log(`${this} Not implemented: context2d.drawImage( ${Array.from(arguments).join(', ')} )`);
+		console.log(`${this} Not implemented: only canvas sources supported: drawImage( <${image.constructor.name}> ${Array.from(arguments).join(', ')} )`);
 	}
 
 	// CanvasImageData
