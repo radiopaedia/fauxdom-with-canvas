@@ -1,25 +1,29 @@
 {
-	"name": "fauxdom",
-	"description": "A fast and lightweight HTML5 parser and DOM for Node.js and browsers.",
-	"version": "1.1.1",
-	"author": "Joe Stenger <sedouri@gmail.com>",
+	"name": "fauxdom-with-canvas",
+	"description": "A fast and lightweight HTML5 parser and DOM with built-in canvas",
+	"version": "0.1.0",
+	"author": "Flaki <git@flaki.hu>",
+    "contributors": [
+        "Joe Stenger <sedouri@gmail.com>",
+        "Flaki <git@flaki.hu>"
+    ],
 	"license": "MIT",
 	"keywords": [
 		"dom",
 		"html",
 		"parser",
 		"selector",
-		"serializer",
-		"html5"
+		"html5",
+        "canvas"
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/sedouri/fauxdom.git"
+		"url": "https://github.com/radiopaedia/fauxdom-with-canvas.git"
 	},
 	"bugs": {
-		"url": "https://github.com/sedouri/fauxdom/issues"
+		"url": "https://github.com/radiopaedia/fauxdom-with-canvas/issues"
 	},
-	"homepage": "https://github.com/sedouri/fauxdom",
+	"homepage": "https://github.com/radiopaedia/fauxdom-with-canvas",
 	"files": [
 		"lib/fauxdom.cjs",
 		"lib/fauxdom.mjs",
@@ -30,7 +34,7 @@
 		"lib": "lib/"
 	},
 	"engines": {
-		"node": ">=6"
+		"node": ">=20"
 	},
 	"main": "index.js",
 	"scripts": {

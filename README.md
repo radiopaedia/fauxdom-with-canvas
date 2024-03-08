@@ -1,8 +1,14 @@
-# FauxDOM
+# FauxDOM with Canvas
 
-![Build Status](https://github.com/sedouri/fauxdom/workflows/build/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/sedouri/fauxdom/badge.svg?branch=master)](https://coveralls.io/github/sedouri/fauxdom?branch=master)
+A fast and lightweight JavaScript library for parsing, modifying, and outputting HTML using a (mostly) standard DOM API. Originally created by [sedouri](https://github.com/sedouri/fauxdom), this fork adds additional features and aims to be used on the server side, primarily in Node.js.
 
-A fast and lightweight JavaScript library for parsing, modifying, and outputting HTML using a (mostly) standard DOM API, either on the server in Node.js or in any reasonably modern browser.
+Newly added features include:
+
+- Expanded support for the HTML `<canvas>` element and a subset of the `HTMLCanvasContext2D` API implemented in pure JavaScript
+- The `style` attributed and the DOM `style` property accessors
+- Support for other APIs: `EventTarget`, `classList`
+
+The HTML & DOM features have been largely left intact, their original description to follow:
 
 ## Description
 
