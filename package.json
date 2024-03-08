@@ -25,9 +25,9 @@
 	},
 	"homepage": "https://github.com/radiopaedia/fauxdom-with-canvas",
 	"files": [
-		"lib/fauxdom.cjs",
-		"lib/fauxdom.mjs",
-		"lib/fauxdom.js",
+		"lib/fauxdom-with-canvas.cjs",
+		"lib/fauxdom-with-canvas.mjs",
+		"lib/fauxdom-with-canvas.js",
 		"lib/entities.json"
 	],
 	"directories": {
@@ -53,7 +53,7 @@
 	"jest": {
 		"collectCoverage": true,
 		"collectCoverageFrom": [
-			"lib/fauxdom.cjs"
+			"lib/fauxdom-with-canvas.cjs"
 		],
 		"snapshotFormat": {
 			"escapeString": true,

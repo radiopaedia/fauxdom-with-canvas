@@ -71,7 +71,10 @@ function onwarn( warning )
 	if ( warning.code !== "CIRCULAR_DEPENDENCY" ||
 			!(warning.message.endsWith( "src/node.js -> src/document.js" ) || warning.message.endsWith( "src\\node.js -> src\\document.js" ) ||
 				warning.message.endsWith( "src/node.js -> src/html-parser.js" ) || warning.message.endsWith( "src\\node.js -> src\\html-parser.js" ) ||
-				warning.message.endsWith( "src/selectors.js -> src/node.js" ) || warning.message.endsWith( "src\\selectors.js -> src\\node.js" )) )
+				warning.message.endsWith( "src/selectors.js -> src/node.js" ) || warning.message.endsWith( "src\\selectors.js -> src\\node.js" ) ||
+				warning.message.includes( "js-canvas" )
+			)
+		)
 		console.warn( warning );
 }
 
