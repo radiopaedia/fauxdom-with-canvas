@@ -2,7 +2,7 @@ const fs = require( "fs" ),
 	path = require( "path" );
 var standardEntities;
 
-module.exports = require( "./lib/fauxdom.cjs" );
+module.exports = require( "./lib/fauxdom-with-canvas.cjs" );
 
 module.exports.prototype.importStandardEntities = function()
 {

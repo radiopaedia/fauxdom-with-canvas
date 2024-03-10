@@ -3,10 +3,10 @@
 	"description": "A fast and lightweight HTML5 parser and DOM with built-in canvas",
 	"version": "0.1.0",
 	"author": "Flaki <git@flaki.hu>",
-    "contributors": [
-        "Joe Stenger <sedouri@gmail.com>",
-        "Flaki <git@flaki.hu>"
-    ],
+	"contributors": [
+		"Joe Stenger <sedouri@gmail.com>",
+		"Flaki <git@flaki.hu>"
+	],
 	"license": "MIT",
 	"keywords": [
 		"dom",
@@ -14,7 +14,7 @@
 		"parser",
 		"selector",
 		"html5",
-        "canvas"
+		"canvas"
 	],
 	"repository": {
 		"type": "git",
@@ -37,6 +37,12 @@
 		"node": ">=20"
 	},
 	"main": "index.js",
+	"exports": {
+		"import": "./lib/fauxdom-with-canvas.mjs",
+		"require": "./lib/fauxdom-with-canvas.cjs",
+		"default": "./index.js"
+	},
+	"type": "module",
 	"scripts": {
 		"test": "npm run build:debug && jest",
 		"build:ts": "npm exec tsc",
