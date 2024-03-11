@@ -65,13 +65,12 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 
 		// Optimization: full-canvas fill
 		if (x === 0 && y === 0 && data.length === w*h*4) {
-			for (let i = 0; i < data.length; ++i) {
+			for (let i = 0; i < data.length; i+=4) {
 				data[i+0] = r;
 				data[i+1] = g;
 				data[i+2] = b;
 				data[i+3] = alpha;
 			}
-
 			console.log(`${this}→fillRect( ${Array.from(arguments).join(', ')} ) whole canvas with ${r},${g},${b} @ ${alpha}`);
 			return;
 		}
@@ -80,7 +79,7 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 			const startIdx = row*4 + x;
 			const endIdx = row*4 + x + w;
 
-			for (let i = startIdx; i < endIdx; ++i) {
+			for (let i = startIdx; i < endIdx; i+=4) {
 				data[i+0] = r;
 				data[i+1] = g;
 				data[i+2] = b;
