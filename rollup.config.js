@@ -1,5 +1,6 @@
 import terser from "@rollup/plugin-terser";
 import stripCode from "rollup-plugin-strip-code";
+import { wasm } from "@rollup/plugin-wasm";
 import {spawn} from "child_process";
 import {zip} from "compressing";
 import * as fs from "fs";
@@ -8,6 +9,8 @@ import * as path from "path";
 import * as pkg from "./package.json";
 
 let DEBUG = true;
+
+let EXTERNALS = [ "node:fs/promises" ];
 
 spawn( process.execPath, ["./scripts/entities.js"] );
 
@@ -27,24 +30,28 @@ export default args =>
 			start_comment: "@START_BROWSER_ONLY",
 			end_comment: "@END_BROWSER_ONLY"
 		} ),
-		modulePlugins = [debugStripper, browserStripper],
-		iifePlugins = [debugStripper, unitTestStripper],
+		wasmPlugin = wasm({
+			sync: [ "node_modules/squoosh/codecs/resize/pkg/squoosh_resize_bg.wasm" ]
+		}),
+		modulePlugins = [debugStripper, browserStripper, wasmPlugin],
+		iifePlugins = [debugStripper, unitTestStripper, wasmPlugin],
 		output = [
 			{
 				onwarn,
 				input: "src/document.js",
 				plugins: modulePlugins,
+				external: EXTERNALS,
 				output: [
 					module( "esm" ),
-					module( "cjs" )
+					//module( "cjs" )
 				]
 			},
-			{
-				onwarn,
-				input: "src/document.js",
-				plugins: iifePlugins,
-				output: module( "iife" )
-			}
+			// {
+			// 	onwarn,
+			// 	input: "src/document.js",
+			// 	plugins: iifePlugins,
+			// 	output: module( "iife" )
+			// }
 		];
 
 	if ( !DEBUG )
@@ -57,8 +64,9 @@ export default args =>
 		output.push( {
 			onwarn,
 			input: "src/document.js",
-			plugins: [browserStripper],
-			output: module( "cjs", "tests." )
+			plugins: [browserStripper, wasmPlugin],
+			external: EXTERNALS,
+			output: module( "esm", "tests." )
 		} );
 		iifePlugins.push( terser( {compress: false, mangle: false, output: {beautify: true}, safari10: true} ) );
 	}

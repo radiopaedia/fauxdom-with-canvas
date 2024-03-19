@@ -4,6 +4,7 @@ import type { HTMLCanvasElement } from "./HTMLCanvasElement.js";
 
 import { CANVAS_DATA } from "./HTMLCanvasElement.js";
 import { ImageData } from "./ImageData.js";
+import { resizeImage } from "./WasmResize.js"
 
 // Partial types via https://github.com/microsoft/TypeScript/blob/main/src/lib/dom.generated.d.ts
 export type RenderingContext = CanvasRenderingContext2D | ImageBitmapRenderingContext
@@ -37,19 +38,52 @@ interface RGBAColor {
 	a?: number
 }
 
-const FILL_STYLE: unique symbol = Symbol("fill-style");
+interface Context2DState {
+	fillStyle: string
+	scaleX: number
+	scaleY: number
+	translateX: number
+	translateY: number
+}
+
+const STATE: unique symbol = Symbol("context2d-state");
 
 export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, CanvasImageData {
 	readonly canvas: HTMLCanvasElement;
 
-	private [FILL_STYLE]: string;
+	private [STATE]: Context2DState;
+
+	reset() {
+		this[STATE] = {
+			fillStyle: "#000",
+			scaleX: 1,
+			scaleY: 1,
+			translateX: 0,
+			translateY: 0,
+		};
+	}
 
 	get fillStyle(): string {
-		return this[FILL_STYLE];
+		return this[STATE].fillStyle;
 	}
 	set fillStyle(newStyle: string) {
 		console.log(`${this}→fillStyle = ${newStyle}`);
-		this[FILL_STYLE] = newStyle;
+		this[STATE].fillStyle = newStyle;
+	}
+
+	get transformActive(): boolean {
+		const active = this[STATE].scaleX !== 1 || this[STATE].scaleY !== 1 || this[STATE].translateX !== 0 || this[STATE].translateY !== 0;
+
+		if (active) {
+			const activeTransforms = [];
+			if (this[STATE].scaleX !== 1) activeTransforms.push(`scaleX: ${this[STATE].scaleX}`);
+			if (this[STATE].scaleY !== 1) activeTransforms.push(`scaleY: ${this[STATE].scaleY}`);
+			if (this[STATE].translateX !== 0) activeTransforms.push(`translateX: ${this[STATE].translateX}`);
+			if (this[STATE].translateY !== 0) activeTransforms.push(`translateY: ${this[STATE].translateY}`);
+			console.log(`${this}: context has active matrix transforms: ${activeTransforms.join(', ')}`);
+		}
+
+		return active;
 	}
 
 	// CanvasRect
@@ -58,6 +92,10 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	}
 
 	fillRect(x: number, y: number, w: number, h: number): void {
+		if (this[STATE].scaleX !== 1 || this[STATE].scaleY !== 1 || this[STATE].translateX !== 0 || this[STATE].translateY !== 0) {
+			console.log(`Warning: ${this}→fillRect( ${Array.from(arguments).join(', ')} ) canvas transform matrix not supported: ${Object.values(this[STATE]).map(([k,v]) => k+': '+v).join(', ')}`);
+		}
+
 		const { r, g, b, a } = this.fillStyleRGBA;
 		const alpha = a*255|0;
 
@@ -98,7 +136,7 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 		this.canvas = parentCanvas;
 
 		// defaults
-		this.fillStyle = "#000";
+		this.reset();
 	}
 
 	// CanvasDrawImage
@@ -109,29 +147,61 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 		if (image instanceof globalThis.HTMLCanvasElement) {
 			w1 = w1 ?? image.width;
 			h1 = h1 ?? image.height;
+			x2 = x2 ?? 0;
+			y2 = y2 ?? 0;
 
 			if (w1 !== w2 || h1 !== h2) {
 				console.log(`${this} Not implemented: image scaling in drawImage( <${image.constructor.name}> ${Array.from(arguments).join(', ')} )`);
 				return;
 			}
 
-			const srcImage = image.getContext("2d").getImageData(x1, y1, w1, h1);
+			let srcImage = image.getContext("2d").getImageData(x1, y1, w1, h1);
+
+			// Scaling/translation needed
+			if (this.transformActive) {
+				// This is slightly inaccurate but we don't do subpixel drawing
+				const targetWidth = this[STATE].scaleX * w1 |0;
+				const targetHeight = this[STATE].scaleY * h1 |0;
+
+				x2 = x2 + this[STATE].translateX |0;
+				y2 = y2 + this[STATE].translateY |0;
+
+				srcImage = resizeImage(srcImage, targetWidth, targetHeight);
+				w1 = srcImage.width;
+				h1 = srcImage.height;
+
+				console.log(`${this}→drawImage(): source image resized to: ${w1}x${h1} (${srcImage.data.length/4} pixels)`);
+				console.log(`${this}→drawImage(): drawing to translated coordinates: ( ${x2}, ${y2} )`);
+			}
+
 			const srcPixels = srcImage.data;
 			const dstPixels = this.canvas[CANVAS_DATA];
+			const canvasW = this.canvas.width;
+			const canvasH = this.canvas.height;
 			const rows = h1;
 			const cols = w1;
 
+			let ntp = 0;
+			let oob = 0;
 			for (let row = 0; row < rows; ++row) {
 				for (let col = 0; col < cols; ++col) {
+					// Index of the destination canvas pixel should be within bounds
+					const di = ((y2 + row) * canvasW + x2 + col) * 4;
+
+					if (di < 0 || di >= dstPixels.length) {
+						++oob;
+						continue;
+					}
+
 					// source pixel
 					const si = ((y1 + row) * srcImage.width + x1 + col) * 4;
 					const sr = srcPixels[ si ];
 					const sg = srcPixels[ si+1 ];
 					const sb = srcPixels[ si+2 ];
 					const sa = srcPixels[ si+3 ];
+					if (sa > 0) ++ntp;
 
 					// destination pixel
-					const di = ((y2 + row) * srcImage.width + x2 + col) * 4;
 					const dr = dstPixels[ di ];
 					const dg = dstPixels[ di+1 ];
 					const db = dstPixels[ di+2 ];
@@ -148,6 +218,8 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 				}
 			}
 			console.log(`${this}→drawImage( <${image.constructor.name}> ${Array.from(arguments).join(', ')} )`);
+			console.log(`${this}→drawImage(): number of non-transparent source pixels drawn: ${ntp} (${ntp/(srcPixels.length/4)*100|0}%)`);
+			console.log(`${this}→drawImage(): skipped drawing of ${oob} out-of-bounds pixels on the canvas`);
 			return;
 		}
 
@@ -233,12 +305,44 @@ export class CanvasRenderingContext2D implements CanvasRect, CanvasDrawImage, Ca
 	setTransform(a: number, b: number, c: number, d: number, e: number, f: number): void;
 	setTransform(transform?: DOMMatrix2DInit): void;
 	setTransform(matrixOrA?: any, b?, c?, d?, e?, f?) {
-		console.log(`${this} Not implemented: context2d.setTransform( ${Array.from(arguments).join(', ')} )`);
+		// Expand calls using a DOMMatrix2D object
+		if (typeof matrixOrA === 'object') {
+			if ('a' in matrixOrA || 'b' in matrixOrA || 'c' in matrixOrA || 'd' in matrixOrA || 'e' in matrixOrA || 'f' in matrixOrA || 
+				'm11' in matrixOrA || 'm12' in matrixOrA || 'm21' in matrixOrA || 'm22' in matrixOrA || 'm31' in matrixOrA || 'm32' in matrixOrA) {
+				return this.setTransform(
+					matrixOrA.a ?? matrixOrA.m11, matrixOrA.b ?? matrixOrA.m12, matrixOrA.c ?? matrixOrA.m21, 
+					matrixOrA.dx ?? matrixOrA.m22, matrixOrA.e ?? matrixOrA.m31, matrixOrA.f ?? matrixOrA.m32
+				);
+			}
+		} else {
+			const a = matrixOrA;
+
+			if ( b !== 0 || c !== 0) {
+				console.log(`${this} Not implemented: context2d.setTransform( ${Array.from(arguments).join(', ')} ) skew/rotate transforms`);
+			}
+
+			this.scale(a,d);
+			this.translate(e,f);
+
+			console.log(`${this}→setTransform( ${Array.from(arguments).join(', ')} )`);
+		}
+	}
+	scale(xScale: number, yScale: number) {
+		this[STATE].scaleX = xScale;
+		this[STATE].scaleY = yScale;
+	}
+	translate(x: number, y: number) {
+		this[STATE].translateX = x;
+		this[STATE].translateY = y;
 	}
 
 	// Stringifies the context object with its canvas & unique ID to ease debugging
 	get [Symbol.toStringTag]() {
 		return `${this.canvas[Symbol.toStringTag]}::context2d`;
+	}
+
+	private setPixel(x,y,r,g,b,a) {
+
 	}
 
 	// https://developer.mozilla.org/en-US/docs/Web/CSS/color_value
