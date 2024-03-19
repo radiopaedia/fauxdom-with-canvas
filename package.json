@@ -1,7 +1,7 @@
 {
 	"name": "fauxdom-with-canvas",
 	"description": "A fast and lightweight HTML5 parser and DOM with built-in canvas",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"author": "Flaki <git@flaki.hu>",
 	"contributors": [
 		"Joe Stenger <sedouri@gmail.com>",
@@ -50,10 +50,13 @@
 		"prepare": "npm exec tsc && rollup -c --silent"
 	},
 	"devDependencies": {
+		"@rollup/plugin-terser": "^0.4.4",
+		"@rollup/plugin-wasm": "^6.2.2",
 		"compressing": "^1.5.0",
 		"jest": "^29.3.0",
 		"rollup": "^2.79.1",
 		"rollup-plugin-strip-code": "^0.2.7",
+		"squoosh": "https://github.com/GoogleChromeLabs/squoosh/archive/refs/tags/v1.12.0.tar.gz",
 		"typescript": "^5.3.3"
 	},
 	"jest": {
@@ -70,8 +73,5 @@
 			"<rootDir>/debug",
 			"<rootDir>/src"
 		]
-	},
-	"dependencies": {
-		"@rollup/plugin-terser": "^0.4.4"
 	}
 }
