@@ -2,7 +2,6 @@
 .travis.yml
 .DS_Store
 .github/
-lib/
 debug/
 coverage/
 reference/
