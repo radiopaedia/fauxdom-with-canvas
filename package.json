@@ -1,7 +1,7 @@
 {
 	"name": "fauxdom-with-canvas",
 	"description": "A fast and lightweight HTML5 parser and DOM with built-in canvas",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"author": "Flaki <git@flaki.hu>",
 	"contributors": [
 		"Joe Stenger <sedouri@gmail.com>",
