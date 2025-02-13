@@ -59,7 +59,7 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 	//getContext(contextId: "bitmaprenderer", options?: ImageBitmapRenderingContextSettings): ImageBitmapRenderingContext | null;
 	//getContext(contextId: string, options?: any): RenderingContext | null;
 	getContext(contextId: ContextID, _options?: any): CanvasRenderingContext2D {
-		if (contextId != "2d") throw new Error(`Not implemented: ${contextId}`);
+		if (contextId != "2d") console.warn(new Error(`WARNING! Not implemented: <HTMLCanvasElement>.getContext('${contextId}')`));
 
 		this[CONTEXT] = this[CONTEXT] || new CanvasRenderingContext2D(this);
 
@@ -68,12 +68,13 @@ export class HTMLCanvasElement extends Node implements Partial<HTMLCanvasElement
 		return this[CONTEXT];
 	}
 
-	toDataURL(_type = "image/png", _quality: any): string {
-		throw new Error("Not implemented")
+	toDataURL(type = "image/png", quality: any): string {
+		console.warn(new Error(`WARNING! Not implemented: <HTMLCanvasElement>.toDataURL(...)`), arguments);
+		return ""
 	}
 
 	toBlob(_callback: BlobCallback, _type = "image/png", _quality: any): void {
-		throw new Error("Not implemented");
+		console.warn(new Error(`WARNING! Not implemented: <HTMLCanvasElement>.toBlob(...)`), arguments);
 	}
 
 	get clientWidth(): number {
